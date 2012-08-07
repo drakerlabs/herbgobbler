@@ -37,7 +37,7 @@ class I18nKey
   private
 
   def cut_down_to_size( string_to_remove )
-    if( string_to_remove.length < 15 )
+    if( string_to_remove.length < 30 )
       string_to_remove
     else
       if( string_to_remove.rindex( '_' ) )
