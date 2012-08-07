@@ -1,23 +1,23 @@
 grammar ERBGrammer
         rule erb
-             ( 
+             (
                ignorable_javascript_tag /
-               processing_instruction / 
+               processing_instruction /
                erb_string /
-               erb_block  / 
+               erb_block  /
                ignorable_script_tag_content /
-               html_end_tag / 
-               html_start_tag / 
-               html_self_contained / 
-               whitespace / 
-               text 
+               html_end_tag /
+               html_start_tag /
+               html_self_contained /
+               whitespace /
+               text
              ) (erb)*
          end
 
-        rule method_names             
+        rule method_names
              "link_to_function" / "link_to" / "button_to" <NonTextNode>
              {
-                def node_name  
+                def node_name
                     "method_names"
                 end
                 def can_be_combined?
@@ -38,16 +38,16 @@ grammar ERBGrammer
                 end
 
             }
-        end 
-       
+        end
+
         rule not_whitespace_or_comma
           ((!comma !space ) . )+ <NonTextNode>
           {
-          
-            def can_be_combined? 
+
+            def can_be_combined?
                true
             end
-          
+
             def node_name
               "not_whitespace_or_comma"
             end
@@ -57,36 +57,36 @@ grammar ERBGrammer
         rule double_quoted_non_string
           '"' ( !'"' .)* '"' <NonTextNode>
           {
-            def can_be_combined? 
+            def can_be_combined?
                true
             end
-          
+
             def node_name
               "double_quoted_non_string"
-            end            
+            end
           }
         end
 
         rule single_quoted_non_string
           "'" ( !"'" .)* "'" <NonTextNode>
           {
-            def can_be_combined? 
+            def can_be_combined?
                true
             end
-          
+
             def node_name
               "single_quoted_non_string"
-            end            
+            end
           }
         end
-          
+
         rule pluralize
           "pluralize"  space? "("? space? repetition:not_whitespace_or_comma space? comma space? string_to_pluralize:(single_quoted_non_string / double_quoted_non_string) space? ")"? space? <PluralizeNode>
           {
-            def can_be_combined? 
+            def can_be_combined?
                true
             end
-          
+
             def node_name
               "pluralize"
             end
@@ -96,14 +96,14 @@ grammar ERBGrammer
         rule method_call_content
              method_names whitespace ruby_string:(double_quoted_ruby_string / single_quoted_ruby_string) everything_else:(comma erb_string_non_text_content)? <MethodCallNode>
         end
-       
+
         rule erb_string_non_text_content
              (!erb_block_end .)* <ErbStringNonTextContent>
              {
                 def can_be_combined?
                     ( self.text_value.nil? || self.text_value.strip!.nil? || !self.text_value.strip!.match(/^render/) ) && !(/ do$/.match( self.text_value.strip ) )
-                end                       
-                                         
+                end
+
                 def node_name
                    "erb_string_non_text_content"
                 end
@@ -119,10 +119,10 @@ grammar ERBGrammer
              }
 
         end
-        
-        rule string_variable 
+
+        rule string_variable
             '#{' variable:((!'}'  (pluralize / .))*) '}' <HerbStringVariable>
- 
+
         end
 
         rule single_quoted_ruby_string
@@ -131,11 +131,11 @@ grammar ERBGrammer
                 def can_be_combined?
                     false
                 end
-                
+
                 def html?
                     false
-                end 
-                
+                end
+
                 def text_value
                     self.unquoted_text.text_value
                 end
@@ -153,11 +153,11 @@ grammar ERBGrammer
                 def can_be_combined?
                     false
                 end
-                
+
                 def html?
                     false
-                end 
-                
+                end
+
                 def text_value
                     self.elements.inject("") { |text, node| text += node.text_value }
                 end
@@ -205,14 +205,14 @@ grammar ERBGrammer
              }
 
         end
-        
+
         rule erb_string_start
            '<%=' <NonExtractingNonTextNode>
              {
                 def node_name
                     "erb_string_start"
                 end
-                
+
                 def can_be_combined?
                     true
                 end
@@ -249,7 +249,7 @@ grammar ERBGrammer
              }
 
         end
-        
+
         rule erb_block_end
              ('%>' / '-%>') <NonExtractingNonTextNode>
              {
@@ -281,7 +281,7 @@ grammar ERBGrammer
 
 
         rule html_self_contained
-             start_tag:'<' tag_name:([a-zA-Z])+ tag_contents:(!'/>' (erb_string / .))* end_tag:'/>' <NonTextNode> 
+             start_tag:'<' tag_name:([a-zA-Z])+ tag_contents:(!'/>' (erb_string / .))* end_tag:'/>' <NonTextNode>
              {
                 def can_be_combined?
                    if( tag_name.text_value.downcase == 'br' )
@@ -296,7 +296,7 @@ grammar ERBGrammer
                 end
 
              }
-        end     
+        end
 
         rule html_end_tag
              '</' tag_name:([a-zA-Z])+ (!'>' .)* '>' <NonTextNode>
@@ -311,7 +311,7 @@ grammar ERBGrammer
              }
 
         end
-        
+
         rule tag_to_process
              ('title' space? '=' space? ('\'' / '"' ) text erb_string (!'\'' !'"' text)*  ('\'' / '"') space? ) <NonTextNode>
              {
@@ -351,7 +351,7 @@ grammar ERBGrammer
                 end
              }
 
-        end     
+        end
 
         rule text
              ((!html_self_contained !html_start_tag !html_end_tag !erb_string !erb_block) . )+ <TextNode>
@@ -376,19 +376,19 @@ grammar ERBGrammer
 
                       def can_be_combined?
                           true
-                      end                      
+                      end
            }
         end
-        
+
         rule whitespace
             ((![a-zA-Z\.] !('<' [a-zA-Z]+) !('</' [a-zA-Z]+) !'<%' !'"' !"'" !'<!' ) . )+ <NonTextNode>
             {
-                def can_be_combined?
-                   true
-                end
-               
-               def node_name    
-                    "whitespace"
+               def can_be_combined?
+                  true
+               end
+
+               def node_name
+                  "whitespace"
                end
 
                def white_space?
@@ -396,6 +396,5 @@ grammar ERBGrammer
                end
             }
         end
-        
+
 end
-        
