@@ -43,15 +43,20 @@ class GobbleAll
   end
   
   def execute_i18n
-    locale_file_name = "en.yml"
+    language_code = "en"
     
     rails_view_directory = "#{@rails_root}/app/views"
-    full_yml_file_path = "#{@rails_root}/config/locales/#{locale_file_name}"
     
     rails_translation_store = RailsTranslationStore.new
     text_extractor = RailsTextExtractor.new( rails_translation_store )
     
     Dir["#{rails_view_directory}/**/*html.erb" ].each do |full_erb_file_path|
+      directory_path = full_erb_file_path.match(/app\/views\/(.*)\//)
+
+      yml_name = directory_path.split('/').last+".yml"
+      directory_path.pop
+
+      full_yml_file_path = "#{@rails_root}/config/locales/#{language_code}/#{directory_path}/#{yml_name}"
       
       erb_file = full_erb_file_path.gsub( @rails_root, '' )
       rails_translation_store.start_new_context( convert_path_to_key_path( erb_file.to_s ) )
