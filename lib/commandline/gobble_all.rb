@@ -53,6 +53,8 @@ class GobbleAll
 
       full_yml_file_path = "#{@rails_root}/config/locales/#{language_code}/#{directory_path}/#{yml_name}"
 
+      Dir.mkdir(File.dirname(full_yml_file_path)) unless File.dirname(full_yml_file_path).exist?
+
       rails_translation_store = if File.exists?(full_yml_file_path)
         RailsTranslationStore.load_from_file( full_yml_file_path )
       else
