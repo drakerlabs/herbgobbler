@@ -51,9 +51,9 @@ class GobbleAll
     text_extractor = RailsTextExtractor.new( rails_translation_store )
     
     Dir["#{rails_view_directory}/**/*html.erb" ].each do |full_erb_file_path|
-      directory_path = full_erb_file_path.match(/app\/views\/(.*)\//).to_s
+      directory_path = full_erb_file_path.match(/app\/views\/(.*)\//).to_s.split('/')
 
-      yml_name = directory_path.split('/').last+".yml"
+      yml_name = directory_path.last+".yml"
       directory_path.pop
 
       full_yml_file_path = "#{@rails_root}/config/locales/#{language_code}/#{directory_path}/#{yml_name}"
