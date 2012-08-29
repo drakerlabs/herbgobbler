@@ -65,10 +65,10 @@ class GobbleAll
 
       File.open(full_erb_file_path, 'w') {|f| f.write(erb_file.to_s) }
       puts "Wrote #{full_erb_file_path}"
-    end
 
-    File.open(full_yml_file_path, 'w') {|f| f.write(rails_translation_store.serialize) }
-    puts "Wrote #{full_yml_file_path}"    
+      File.open(full_yml_file_path, 'w') {|f| f.write(rails_translation_store.serialize) }
+      puts "Wrote #{full_yml_file_path}"    
+    end
   end
   
 end
