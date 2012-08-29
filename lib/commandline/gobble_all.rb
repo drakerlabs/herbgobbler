@@ -56,7 +56,7 @@ class GobbleAll
       yml_name = directory_path.last+".yml"
       directory_path.pop
 
-      full_yml_file_path = "#{@rails_root}/config/locales/#{language_code}/#{directory_path}/#{yml_name}"
+      full_yml_file_path = "#{@rails_root}/config/locales/#{language_code}/#{directory_path.join('/')}/#{yml_name}"
       
       erb_file = full_erb_file_path.gsub( @rails_root, '' )
       rails_translation_store.start_new_context( convert_path_to_key_path( erb_file.to_s ) )
