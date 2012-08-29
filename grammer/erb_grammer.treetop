@@ -9,13 +9,14 @@ grammar ERBGrammer
                html_end_tag / 
                html_start_tag / 
                html_self_contained / 
+               text_html_entity / 
                whitespace / 
                text 
              ) (erb)*
          end
 
         rule method_names             
-             "link_to_function" / "link_to"  <NonTextNode>
+             "link_to_function" / "link_to" / "button_to" <NonTextNode>
              {
                 def node_name  
                     "method_names"
@@ -101,9 +102,9 @@ grammar ERBGrammer
              (!erb_block_end .)* <ErbStringNonTextContent>
              {
                 def can_be_combined?
-                    self.text_value.nil? || self.text_value.strip!.nil? || !self.text_value.strip!.match(/^render/)
-                end
-                        
+                    ( self.text_value.nil? || self.text_value.strip!.nil? || !self.text_value.strip!.match(/^render/) ) && !(/ do$/.match( self.text_value.strip ) )
+                end                       
+                                         
                 def node_name
                    "erb_string_non_text_content"
                 end
@@ -352,6 +353,23 @@ grammar ERBGrammer
              }
 
         end     
+        
+        rule non_breaking_space
+          '&nbsp;'
+        end
+
+        rule text_html_entity
+             !non_breaking_space ('&' ([a-zA-Z0-9])+ ';') <TextNode>
+             {
+                def can_be_combined?
+                    true
+                end
+
+                def node_name
+                    "text"
+                end
+             }
+        end
 
         rule text
              ((!html_self_contained !html_start_tag !html_end_tag !erb_string !erb_block) . )+ <TextNode>
@@ -381,7 +399,7 @@ grammar ERBGrammer
         end
         
         rule whitespace
-            ((![a-zA-Z\.] !('<' [a-zA-Z]+) !('</' [a-zA-Z]+) !'<%' !'"' !"'" !'<!' ) . )+ <NonTextNode>
+            non_breaking_space / ( (!text_html_entity ![a-zA-Z\.] !('<' [a-zA-Z]+) !('</' [a-zA-Z]+) !'<%' !'"' !"'" !'<!' ) . )+ <NonTextNode>
             {
                 def can_be_combined?
                    true
