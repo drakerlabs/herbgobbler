@@ -48,7 +48,7 @@ class GobbleAll
     rails_view_directory = "#{@rails_root}/app/views"
     
     Dir.glob("#{rails_view_directory}/**/*.html.erb").group_by { |x| File.dirname(x) }.each do |directory, files|
-      directory_path = File.dirname(directory).match(/views\/(.*)/).to_s
+      directory_path = File.dirname(directory)
       yml_name = File.basename(directory)+".yml"
 
       full_yml_file_path = "#{@rails_root}/config/locales/#{language_code}/#{directory_path}/#{yml_name}"
