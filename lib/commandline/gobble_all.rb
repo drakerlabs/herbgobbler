@@ -43,16 +43,12 @@ class GobbleAll
   end
   
   def execute_i18n
-    language_code = "en"
+    file_name = 'phrase.en.yml'
     
     rails_view_directory = "#{@rails_root}/app/views"
+    full_yml_file_path = "#{@rails_root}/phrase/locales/#{file_name}"
     
     Dir.glob("#{rails_view_directory}/**/*.html.erb").group_by { |x| File.dirname(x) }.each do |directory, files|
-      directory_path = File.dirname(directory).match(/app\/(.+)/)[1]
-      yml_name = File.basename(directory)+".yml"
-
-      full_yml_file_path = "#{@rails_root}/config/locales/#{language_code}/#{directory_path}/#{yml_name}"
-
       FileUtils.mkdir_p(File.dirname(full_yml_file_path)) unless File.directory?(File.dirname(full_yml_file_path))
 
       rails_translation_store = if File.exists?(full_yml_file_path)
